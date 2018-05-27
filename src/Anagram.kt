@@ -6,13 +6,25 @@ fun getAnagramsFromWordlist(wordList: List<String>): List<Set<String>> {
     val anagrams = mutableMapOf<String, MutableSet<String>>()
 
     for (word in wordList) {
-        val key = word.toLowerCase().toCharArray().sorted().toString()
-        anagrams.getOrPut(key) { mutableSetOf() } += word
+        anagrams.getOrPut(getNormalizedWord(word)) { mutableSetOf() } += word
     }
 
-    return anagrams.values.map { it.toSet() }
+    val result = anagrams.values
+            .map { it.distinctBy { it.toLowerCase().filter { it.isLetter() } } }
+            .filter { it.size > 1 }
+            .map { it.toSet() }
+    return result
 }
 
 fun getWordListFromFile(wordlistFileLocation: String): List<String> {
     return File(wordlistFileLocation).readLines()
+}
+
+fun getNormalizedWord(word: String): String {
+    return word
+            .toLowerCase()
+            .toCharArray()
+            .filter { it.isLetter() }
+            .sorted()
+            .joinToString("")
 }
